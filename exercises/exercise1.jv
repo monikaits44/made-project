@@ -17,33 +17,29 @@ pipeline AirportsDataPipeline {
   // Interpret the downloaded file as a text file.
   block AirportsTextFileInterpreter oftype TextFileInterpreter { }
 
-  // Interpret the text file as CSV.
+  // Interpret the text file as CSV with ";" as delimiter.
   block AirportsCSVInterpreter oftype CSVInterpreter {
     delimiter: ";";
   }
 
   // Define the table structure for the airports data.
-  // Exclude the columns "Zeitzone", "DST", "Zeitzonen-Datenbank", and "geo_punkt".
+  // Only include specified columns and assign appropriate SQLite types.
   block AirportsTableInterpreter oftype TableInterpreter {
     header: true;
     columns: [
-      "Lfd. Nummer" oftype integer,
-      "Name des Flughafens" oftype text, 
-      "Ort" oftype text,
-      "Land" oftype text, 
-      "IATA" oftype text,
-      "ICAO" oftype text,
-      "Latitude" oftype decimal,
-      "Longitude" oftype decimal,
-      "Altitude" oftype integer,
-      "Zeitzone" oftype decimal,
-      "DST" oftype text,
-      "Zeitzonen-Datenbank" oftype text,
-      "geo_punkt" oftype text
+      "Lfd. Nummer" oftype INTEGER,             // id
+      "Name des Flughafens" oftype TEXT,        // name
+      "Ort" oftype TEXT,                        // city
+      "Land" oftype TEXT,                       // country
+      "IATA" oftype TEXT,
+      "ICAO" oftype TEXT,
+      "Latitude" oftype FLOAT,
+      "Longitude" oftype FLOAT,
+      "Altitude" oftype INTEGER
     ];
   }
 
-  // Load the interpreted table into a SQLite database "airports.sqlite".
+  // Load the interpreted table into a SQLite database called "airports.sqlite".
   block AirportsLoader oftype SQLiteLoader {
     table: "airports";
     file: "./airports.sqlite";
