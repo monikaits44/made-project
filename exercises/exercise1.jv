@@ -42,6 +42,6 @@ pipeline AirportsDataPipeline {
   // Load the interpreted table into a SQLite database "airports.sqlite".
   block AirportsLoader oftype SQLiteLoader {
     table: "airports";
-    file: "./exercises/airports.sqlite";
+    file: "./airports.sqlite";
   }
 }
