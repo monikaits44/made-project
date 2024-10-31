@@ -22,8 +22,7 @@ pipeline AirportsDataPipeline {
     delimiter: ";";
   }
 
-  // Define the table structure for the airports data.
-  // Only include specified columns and assign appropriate SQLite types.
+  // Defined table structure for the airports data and Only include specified columns and assigned appropriate SQLite types.
   block AirportsTableInterpreter oftype TableInterpreter {
     header: true;
     columns: [
@@ -39,7 +38,7 @@ pipeline AirportsDataPipeline {
     ];
   }
 
-  // Load the interpreted table into a SQLite database called "airports.sqlite".
+  // Load the interpreted table into a SQLite database "airports.sqlite".
   block AirportsLoader oftype SQLiteLoader {
     table: "airports";
     file: "./airports.sqlite";
