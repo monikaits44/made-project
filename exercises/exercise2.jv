@@ -1,0 +1,67 @@
+pipeline TreesDataPipeline {
+    treesDataExtractor -> treesTextInterpreter;
+
+    treesTextInterpreter
+        -> treesCSVInterpreter 
+        -> treesColumnDeleter
+        -> treesTableInterpreter
+        -> treesDataLoader;
+
+    // Block to extract data directly from the provided URL
+    block treesDataExtractor oftype HttpExtractor {
+        url: "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv";
+        retries: 5;
+    }
+
+    // Block to interpret data as text
+    block treesTextInterpreter oftype TextFileInterpreter {}
+
+    // Block to remove the 'baumart_deutsch' column
+    block treesColumnDeleter oftype ColumnDeleter {
+        delete: [column E];
+    }
+
+    // Constraints to validate data requirements
+    constraint VogelsangConstraint oftype RegexConstraint {
+        regex: /^Vogelsang/;
+    }
+
+    constraint GeoCoordinateConstraint oftype RegexConstraint {
+        regex: /^\d{1,3}\.\d+,\s?\d{1,3}\.\d+$/;
+    }
+
+    // Custom value type enforcing the 'Vogelsang' filter on 'stadtteil' column
+    valuetype VogelsangPattern oftype text {
+        constraints: [VogelsangConstraint];
+    }
+
+    // Custom value type to ensure 'id' column follows the geo-coordinate format
+    valuetype GeoCoordinatePattern oftype text {
+        constraints: [GeoCoordinateConstraint];
+    }
+
+    // Block to interpret CSV data format and define table column types
+    block treesCSVInterpreter oftype CSVInterpreter {
+        delimiter: ";";
+        enclosing: '';
+    }
+
+    // Block to define columns and data types in the table with constraints
+    block treesTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "lfd_nr" oftype integer,
+            "stadtteil" oftype VogelsangPattern,
+            "standort" oftype text,
+            "baumart_botanisch" oftype text,
+            "id" oftype GeoCoordinatePattern,
+            "baumfamilie" oftype text
+        ];
+    }
+
+    // Load the interpreted table into a SQLite database "trees.sqlite".
+    block treesDataLoader oftype SQLiteLoader {
+        table: "trees";
+        file: "./trees.sqlite";
+    }
+}
