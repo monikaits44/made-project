@@ -7,7 +7,7 @@ pipeline TreesDataPipeline {
         -> treesTableInterpreter
         -> treesDataLoader;
 
-    // Block to extract data directly from the provided URL
+    // Block to extract data from provided URL
     block treesDataExtractor oftype HttpExtractor {
         url: "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv";
         retries: 5;
@@ -16,7 +16,7 @@ pipeline TreesDataPipeline {
     // Block to interpret data as text
     block treesTextInterpreter oftype TextFileInterpreter {}
 
-    // Block to remove the 'baumart_deutsch' column
+    // Block to remove the 'baumart_deutsch' column address with E
     block treesColumnDeleter oftype ColumnDeleter {
         delete: [column E];
     }
