@@ -9,19 +9,35 @@ How has the use of AI technologies impacted economic growth and labor market tre
 ## Description
 With more and more AI technologies integrating into various industries across both Americas, the economic growth and labor markets of these regions have largely been reshaped. The present data science project focuses on examining the relationship between the adoption of AI and major economic variables that account for GDP growth and employment. Therefore, some of the modern techniques of data engineering used in the project are cleaning, transformation, and statistical analysis to draw insights into the positive and negative impacts AI has had on job markets and economic performance. EDA and machine learning models will be conducted to create future trends from historical data.
 
+## Research Paper :
+
+https://www.researchgate.net/publication/378555335_THE_IMPACT_OF_AI_ON_US_LABOR_MARKETS
+
 ## Datasources
 
-### Datasource1: US Macro Regional Data
+### Datasource1: Unemployment in America, Per US State
+Data URL : [Unemployment in America, Per US State] (https://www.kaggle.com/datasets/justin2028/unemployment-in-america-per-us-state)
+Data Type: CSV
+
+### Datasource2: From Data Entry to CEO: The AI Job Threat Index
+* Data URL : [From Data Entry to CEO: The AI Job Threat Index](https://www.kaggle.com/code/rajatraj0502/from-data-entry-to-ceo-the-ai-job-threat-index/notebook)
+Data Type: CSV
+
+### Datasource3: Potential Impact of AI on the Labor Market
+* Data URL : [Potential Impact of AI on the Labor Market](https://www.kaggle.com/code/egorpantyukhin/potential-impact-of-ai-on-the-labor-market)
+Data Type: CSV
+
+### Datasource4: US Macro Regional Data
 * Metadata URL: [American Economic Association](https://www.aeaweb.org/resources/data/us-macro-regional)
 * Data URL: [US Macro Regional Data](https://www.aeaweb.org/resources/data/us-macro-regional)
 * Data Type: CSV
 
-This dataset includes macroeconomic data at the regional level in the United States, covering indicators like GDP, employment rates, and industry outputs. It is crucial for understanding the economic impact of AI technologies across different regions.
-
-### Datasource2: Bureau of Labor Statistics (BLS) Employment Data
+### Datasource5: Bureau of Labor Statistics (BLS) Employment Data
 * Metadata URL: [BLS Data](https://www.bls.gov/data/)
 * Data URL: [BLS Employment Data CSV](https://www.bls.gov/ces/data.htm)
 * Data Type: CSV
+
+This dataset includes macroeconomic data at the regional level in the United States, covering indicators like GDP, employment rates, and industry outputs. It is crucial for understanding the economic impact of AI technologies across different regions.
 
 ## Work Packages
 
