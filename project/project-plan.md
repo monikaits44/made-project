@@ -16,7 +16,7 @@ https://www.researchgate.net/publication/378555335_THE_IMPACT_OF_AI_ON_US_LABOR_
 ## Datasources
 
 ### Datasource1: Unemployment in America, Per US State
-* Data URL : [Unemployment in America, Per US State] (https://www.kaggle.com/datasets/justin2028/unemployment-in-america-per-us-state)
+* Data URL : [Unemployment in America, Per US State](https://www.kaggle.com/datasets/justin2028/unemployment-in-america-per-us-state)
 * Data Type: CSV
 
 ### Datasource2: From Data Entry to CEO: The AI Job Threat Index
