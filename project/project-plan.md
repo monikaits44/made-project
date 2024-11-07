@@ -16,16 +16,16 @@ https://www.researchgate.net/publication/378555335_THE_IMPACT_OF_AI_ON_US_LABOR_
 ## Datasources
 
 ### Datasource1: Unemployment in America, Per US State
-Data URL : [Unemployment in America, Per US State] (https://www.kaggle.com/datasets/justin2028/unemployment-in-america-per-us-state)
-Data Type: CSV
+* Data URL : [Unemployment in America, Per US State] (https://www.kaggle.com/datasets/justin2028/unemployment-in-america-per-us-state)
+* Data Type: CSV
 
 ### Datasource2: From Data Entry to CEO: The AI Job Threat Index
 * Data URL : [From Data Entry to CEO: The AI Job Threat Index](https://www.kaggle.com/code/rajatraj0502/from-data-entry-to-ceo-the-ai-job-threat-index/notebook)
-Data Type: CSV
+* Data Type: CSV
 
 ### Datasource3: Potential Impact of AI on the Labor Market
 * Data URL : [Potential Impact of AI on the Labor Market](https://www.kaggle.com/code/egorpantyukhin/potential-impact-of-ai-on-the-labor-market)
-Data Type: CSV
+* Data Type: CSV
 
 ### Datasource4: US Macro Regional Data
 * Metadata URL: [American Economic Association](https://www.aeaweb.org/resources/data/us-macro-regional)
