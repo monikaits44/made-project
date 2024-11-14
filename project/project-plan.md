@@ -1,43 +1,41 @@
 # Project Plan
 
 ## Title
-Impact of AI Technologies on Economic Growth and Labor Markets in the Americas
+Sustainability Management in the Supply Chain Industries in the America
 
 ## Main Question
-How has the use of AI technologies impacted economic growth and labor market trends in North and South America over the past decade?
+How do greenhouse gas emissions footprint vary across different supply chain sectors in the America?
 
 ## Description
-With more and more AI technologies integrating into various industries across both Americas, the economic growth and labor markets of these regions have largely been reshaped. The present data science project focuses on examining the relationship between the adoption of AI and major economic variables that account for GDP growth and employment. Therefore, some of the modern techniques of data engineering used in the project are cleaning, transformation, and statistical analysis to draw insights into the positive and negative impacts AI has had on job markets and economic performance. EDA and machine learning models will be conducted to create future trends from historical data.
-
-## Research Paper :
-
-https://www.researchgate.net/publication/378555335_THE_IMPACT_OF_AI_ON_US_LABOR_MARKETS
+As sustainability becomes an integral part of business strategies, firms must be informed of the type of differences in greenhouse gas (GHG) emissions between various supply chain sectors to reduce their carbon footprint. This project is hence aimed at considering and analyzing GHG emissions data from different supply chain sectors in the United States. The analysis would compare the emissions footprints of industries such as manufacture, transportation, and retail sectors by analyzing multiple datasets on supply chain emissions, and transportation-related GHG data. Data cleaning and transformation and exploratory data analysis (EDA) would be used to gain insight into how the trend is going across sector after statistical analysis. The takeaway is to provide actionable insights aimed at reducing emissions across supply chains while at the same time pointing to possible areas for improvement for U.S. industries.
 
 ## Datasources
 
-### Datasource1: Unemployment in America, Per US State
-* Data URL : [Unemployment in America, Per US State](https://www.kaggle.com/datasets/justin2028/unemployment-in-america-per-us-state)
+### Datasource1:  Supply Chain Greenhouse Gas Emission Factors v1.3 by NAICS-6
+* Data URL : [ Supply Chain Greenhouse Gas Emission Factors v1.3 by NAICS-6](https://catalog.data.gov/dataset/supply-chain-greenhouse-gas-emission-factors-v1-3-by-naics-6)
 * Data Type: CSV
 
-### Datasource2: From Data Entry to CEO: The AI Job Threat Index
-* Data URL : [From Data Entry to CEO: The AI Job Threat Index](https://www.kaggle.com/code/rajatraj0502/from-data-entry-to-ceo-the-ai-job-threat-index/notebook)
+### Datasource2: Supply Chain Greenhouse Gas Emission Factors for US Industries and Commodities
+* Data URL : [Supply Chain Greenhouse Gas Emission Factors for US Industries and Commodities](https://catalog.data.gov/dataset/supply-chain-greenhouse-gas-emission-factors-for-us-industries-and-commodities)
 * Data Type: CSV
 
-### Datasource3: Potential Impact of AI on the Labor Market
-* Data URL : [Potential Impact of AI on the Labor Market](https://www.kaggle.com/code/egorpantyukhin/potential-impact-of-ai-on-the-labor-market)
+### Datasource3: Transportation-Related Greenhouse Gas Emissions
+* Data URL : [Transportation-Related Greenhouse Gas Emissions](https://www.bts.gov/browse-statistical-products-and-data/national-transportation-statistics/transportation-related)
+* Data Type: XLSX
+
+### Datasource4: U.S. Greenhouse Gas Emissions from Domestic Freight Transportation
+* Data URL: [U.S. Greenhouse Gas Emissions from Domestic Freight Transportation](https://www.bts.gov/browse-statistical-products-and-data/freight-facts-and-figures/us-greenhouse-gas-emissions-domestic)
 * Data Type: CSV
 
-### Datasource4: US Macro Regional Data
-* Metadata URL: [American Economic Association](https://www.aeaweb.org/resources/data/us-macro-regional)
-* Data URL: [US Macro Regional Data](https://www.aeaweb.org/resources/data/us-macro-regional)
-* Data Type: CSV
+## Resources :
 
-### Datasource5: Bureau of Labor Statistics (BLS) Employment Data
-* Metadata URL: [BLS Data](https://www.bls.gov/data/)
-* Data URL: [BLS Employment Data CSV](https://www.bls.gov/ces/data.htm)
-* Data Type: CSV
+[Greenhouse Gas Emissions in the United States](https://net0.com/blog/greenhouse-gas-emissions-in-the-united-states)
 
-This dataset includes macroeconomic data at the regional level in the United States, covering indicators like GDP, employment rates, and industry outputs. It is crucial for understanding the economic impact of AI technologies across different regions.
+[Carbon footprints in the supply chain: the next step for business](https://openknowledge.fao.org/server/api/core/bitstreams/a9d7fdd3-1699-4fd5-bd9e-e7f1aee9c781/content)
+
+[Predictive Analytics and Machine Learning Applications in the USA for Sustainable Supply Chain Operations and Carbon Footprint Reduction](https://www.researchgate.net/profile/Mahfuz-Alam-11/publication/382689843_Predictive_Analytics_and_Machine_Learning_Applications_in_the_USA_for_Sustainable_Supply_Chain_Operations_and_Carbon_Footprint_Reduction/links/66ab2fb74433ad480e8a15cb/Predictive-Analytics-and-Machine-Learning-Applications-in-the-USA-for-Sustainable-Supply-Chain-Operations-and-Carbon-Footprint-Reduction.pdf)
+
+[Efficient Strategies on Supply Chain Network Optimization for Industrial Carbon Emission Reduction](https://arxiv.org/abs/2404.16863)
 
 ## Work Packages
 
