@@ -22,7 +22,6 @@ def download_file(url, local_path):
         file.write(response.content)
     print(f"Downloaded {url} to {local_path}")
 
-# Download the files
 for key, url in file_paths.items():
     download_file(url, f"data/{key}.csv" if key != 'us_industries' and key != 'table_4_44' else f"data/{key}.xlsx")
 
