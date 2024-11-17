@@ -1,0 +1,97 @@
+pipeline CountryDataStatsProcessing {
+
+    // Main data processing for Bond Issuance Statistics
+    CountryDataDownloader
+        -> ExcelInterpreter
+        -> SheetSelector
+        -> DataRangeSelector
+        -> BondStatsColumnFilter
+        -> BondStatsTableFormatter
+        -> BondDataLoader;
+
+    // Parallel pipeline to process GDP per Capita Statistics
+    DataRangeSelector
+        -> GdpStatsColumnFilter
+        -> GdpStatsTableFormatter
+        -> GdpDataLoader;
+
+    // Block to fetch the Excel file from the specified URL
+    block CountryDataDownloader oftype HttpExtractor {
+        url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+        retries: 5;
+    }
+
+    // Block to parse the downloaded Excel file
+    block ExcelInterpreter oftype XLSXInterpreter {}
+
+    // Block to focus on the required sheet by its name
+    block SheetSelector oftype SheetPicker {
+        sheetName: "Figure S5.1.2";
+    }
+
+    // Block to select the relevant cell range from the sheet
+    block DataRangeSelector oftype CellRangeSelector {
+        select: range P3:S45;
+    }
+
+    // Filter irrelevant columns from the Bond Issuance data
+    block BondStatsColumnFilter oftype ColumnDeleter {
+        delete: [column B, column C];
+    }
+
+    // Filter irrelevant columns from the GDP per Capita data
+    block GdpStatsColumnFilter oftype ColumnDeleter {
+        delete: [column B, column D];
+    }
+
+    // Format Bond Issuance data into a structured table
+    block BondStatsTableFormatter oftype TableInterpreter {
+        header: false;
+        columns: [
+            "Country Code" oftype CountryCodeAlpha3,
+            "Bond Issuance Share" oftype BondIssuanceMetric
+        ];
+    }
+
+    // Format GDP per Capita data into a structured table
+    block GdpStatsTableFormatter oftype TableInterpreter {
+        header: false;
+        columns: [
+            "Country Code" oftype CountryCodeAlpha3,
+            "GDP per Capita" oftype GdpPerCapitaMetric
+        ];
+    }
+
+    // Define a value type for GDP per Capita with constraints
+    valuetype GdpPerCapitaMetric oftype decimal {
+        constraints: [PositiveGdpConstraint];
+    }
+
+    // Ensure GDP per Capita is a non-negative value
+    constraint PositiveGdpConstraint on decimal: value >= 0;
+
+    // Define a value type for Bond Issuance Share with constraints
+    valuetype BondIssuanceMetric oftype decimal {
+        constraints: [BondRangeConstraint];
+    }
+
+    // Ensure Bond Issuance Share is between 0 and 1 inclusive
+    constraint BondRangeConstraint oftype RangeConstraint {
+        lowerBound: 0;
+        lowerBoundInclusive: true;
+        upperBound: 1;
+        upperBoundInclusive: true;
+    }
+
+    // Load the Bond Issuance data into SQLite
+    block BondDataLoader oftype SQLiteLoader {
+        table: "bond_issuance_stats";
+        file: "./country-stats.sqlite";
+    }
+
+    // Load the GDP per Capita data into SQLite
+    block GdpDataLoader oftype SQLiteLoader {
+        table: "gdp_per_capita_stats";
+        file: "./country-stats.sqlite";
+    }
+}
