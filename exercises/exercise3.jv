@@ -31,7 +31,7 @@ pipeline CountryDataStatsProcessing {
 
     // Block to select the relevant cell range from the sheet
     block DataRangeSelector oftype CellRangeSelector {
-        select: range P3:S45;
+        select: range P2:S45;
     }
 
     // Filter irrelevant columns from the Bond Issuance data
