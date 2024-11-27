@@ -40,51 +40,65 @@ def transform_excel_to_df(file_path, sheet_name):
 def connect_db(db_name=f'{DATA_DIR}/emission.db'):
     return sqlite3.connect(db_name)
 
+def connect_insights_db():
+    return sqlite3.connect(f'{DATA_DIR}/insights.db')
+
 # Save DataFrame to SQLite
 def save_to_sqlite(df, table_name, conn):
     df.to_sql(table_name, conn, if_exists='replace', index=False)
     print(f"Saved {table_name} data to SQLite.")
 
-# Process CSV files
-def process_csv_files(conn, use_cache):
+# Process CSV files and save with '2017' prefix
+def process_csv_files(conn, use_cache, insights_conn):
     file_paths_local = {
         "naics_co2": f"{DATA_DIR}/naics_co2.csv",
         "naics_ghg": f"{DATA_DIR}/naics_ghg.csv"
     }
+    
     for key, url in file_paths.items():
         if key in file_paths_local:
             local_path = file_paths_local[key]
             if not use_cache:
                 download_file(url, local_path)
             df = transform_csv_to_df(local_path)
-            save_to_sqlite(df, key, conn)
+            # Add '2017' prefix to table name and store in insights.db
+            save_to_sqlite(df, f"2017_{key}", insights_conn)
 
-# Process US Industries files
-def process_us_industries_files(conn, use_cache):
+# Process US Industries files and create combined versions for each category
+def process_us_industries_files(insights_conn, use_cache):
     local_path = f"{DATA_DIR}/us_industries.xlsx"
     if not use_cache:
         download_file(file_paths["us_industries"], local_path)
     
-    years = [str(year) for year in range(2010, 2017)]
+    # Categories to be processed
     categories = ['Summary_Commodity', 'Summary_Industry', 'Detail_Commodity', 'Detail_Industry']
-    
-    for year in years:
-        for category in categories:
+    years = [str(year) for year in range(2010, 2017)]  # 2010-2016
+
+    # Iterate over each category and combine data
+    for category in categories:
+        combined_df = pd.DataFrame()
+        for year in years:
             sheet_name = f'{year}_{category}'
             try:
                 df = transform_excel_to_df(local_path, sheet_name)
-                save_to_sqlite(df, sheet_name, conn)
+                combined_df = pd.concat([combined_df, df], ignore_index=True)
             except ValueError:
                 print(f"Sheet {sheet_name} not found in the Excel file.")
+        
+        # After combining data for a category, save it into insights.db
+        table_name = f"{category}_2010_2016"
+        save_to_sqlite(combined_df, table_name, insights_conn)
 
 # Process Table 4-44
-def process_table_4_44(conn, use_cache):
+def process_table_4_44(insights_conn, use_cache):
     local_path = f"{DATA_DIR}/table_4_44.xlsx"
     if not use_cache:
         download_file(file_paths["table_4_44"], local_path)
     try:
         df = transform_excel_to_df(local_path, sheet_name="4-44")
-        save_to_sqlite(df, 'categorywise_ghg_Emissions', conn)
+        # Clean the data if necessary before saving to insights.db
+        df = df.dropna(axis=1, how='all')  # Remove columns with all NaN values
+        save_to_sqlite(df, 'categorywise_ghg_Emissions_1990_2022', insights_conn)
     except ValueError:
         print(f"Sheet 4-44 not found in the Excel file.")
 
@@ -96,18 +110,23 @@ def main():
     args = parser.parse_args()
     use_cache = args.use_cache
 
+    # Connect to both emission.db and insights.db
     conn = connect_db()
+    insights_conn = connect_insights_db()
     
-    # Process CSV files
-    process_csv_files(conn, use_cache)
+    # Process CSV files and store them with '2017' prefix in insights.db
+    process_csv_files(conn, use_cache, insights_conn)
     
-    # Process US Industries data (2010-2016)
-    process_us_industries_files(conn, use_cache)
+    # Process US Industries data (2010-2016) and combine them into single tables for each category
+    process_us_industries_files(insights_conn, use_cache)
     
-    # Process Table 4-44
-    process_table_4_44(conn, use_cache)
+    # Process Table 4-44 and store it in insights.db
+    process_table_4_44(insights_conn, use_cache)
 
+    # Close database connections
     conn.close()
+    insights_conn.close()
+    
     print("Data pipeline executed successfully.")
 
 if __name__ == '__main__':
