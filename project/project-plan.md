@@ -29,15 +29,15 @@ As sustainability becomes an integral part of business strategies, firms must be
 
 ## Resources :
 
-[Greenhouse Gas Emissions in the United States](https://net0.com/blog/greenhouse-gas-emissions-in-the-united-states)
+* [Greenhouse Gas Emissions in the United States](https://net0.com/blog/greenhouse-gas-emissions-in-the-united-states)
 
-[Carbon footprints in the supply chain: the next step for business](https://openknowledge.fao.org/server/api/core/bitstreams/a9d7fdd3-1699-4fd5-bd9e-e7f1aee9c781/content)
+* [Carbon footprints in the supply chain: the next step for business](https://openknowledge.fao.org/server/api/core/bitstreams/a9d7fdd3-1699-4fd5-bd9e-e7f1aee9c781/content)
 
-[Predictive Analytics and Machine Learning Applications in the USA for Sustainable Supply Chain Operations and Carbon Footprint Reduction](https://www.researchgate.net/profile/Mahfuz-Alam-11/publication/382689843_Predictive_Analytics_and_Machine_Learning_Applications_in_the_USA_for_Sustainable_Supply_Chain_Operations_and_Carbon_Footprint_Reduction/links/66ab2fb74433ad480e8a15cb/Predictive-Analytics-and-Machine-Learning-Applications-in-the-USA-for-Sustainable-Supply-Chain-Operations-and-Carbon-Footprint-Reduction.pdf)
+* [Predictive Analytics and Machine Learning Applications in the USA for Sustainable Supply Chain Operations and Carbon Footprint Reduction](https://www.researchgate.net/profile/Mahfuz-Alam-11/publication/382689843_Predictive_Analytics_and_Machine_Learning_Applications_in_the_USA_for_Sustainable_Supply_Chain_Operations_and_Carbon_Footprint_Reduction/links/66ab2fb74433ad480e8a15cb/Predictive-Analytics-and-Machine-Learning-Applications-in-the-USA-for-Sustainable-Supply-Chain-Operations-and-Carbon-Footprint-Reduction.pdf)
 
-[Efficient Strategies on Supply Chain Network Optimization for Industrial Carbon Emission Reduction](https://arxiv.org/abs/2404.16863)
+* [Efficient Strategies on Supply Chain Network Optimization for Industrial Carbon Emission Reduction](https://arxiv.org/abs/2404.16863)
 
-[Understanding the U.S. Supply Chain's Carbon Footprint: A Data-Driven Approach](https://www.sciencedirect.com/science/article/abs/pii/S0925527324000355)
+* [Understanding the U.S. Supply Chain's Carbon Footprint: A Data-Driven Approach](https://www.sciencedirect.com/science/article/abs/pii/S0925527324000355)
 
 ## Work Packages
 
