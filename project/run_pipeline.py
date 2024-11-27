@@ -62,7 +62,7 @@ def process_csv_files(conn, use_cache, insights_conn):
                 download_file(url, local_path)
             df = transform_csv_to_df(local_path)
             # Add '2017' prefix to table name and store in insights.db
-            save_to_sqlite(df, f"2017_{key}", insights_conn)
+            save_to_sqlite(df, f"{key}_2017", insights_conn)
 
 # Process US Industries files and create combined versions for each category
 def process_us_industries_files(insights_conn, use_cache):
