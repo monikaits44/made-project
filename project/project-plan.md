@@ -37,6 +37,8 @@ As sustainability becomes an integral part of business strategies, firms must be
 
 [Efficient Strategies on Supply Chain Network Optimization for Industrial Carbon Emission Reduction](https://arxiv.org/abs/2404.16863)
 
+[Understanding the U.S. Supply Chain's Carbon Footprint: A Data-Driven Approach](https://www.sciencedirect.com/science/article/abs/pii/S0925527324000355)
+
 ## Work Packages
 
 1. Define Project Scope and Objectives [#1](https://github.com/monikaits44/made-project/issues/1)
