@@ -1,6 +1,6 @@
 # Project Plan
 
-project/GHG Emission in US.jfif
+![alt text](<GHG Emission in US.png>)
 
 ## Title
 Sustainability Management in the Supply Chain Industries in the America
