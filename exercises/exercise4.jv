@@ -1,0 +1,79 @@
+pipeline TemperatureDataPipeline {
+
+    // Step 1: Download the dataset
+    DataDownloader 
+    -> Unzipper 
+    -> CSVReader 
+    -> DataCleaner 
+    -> ColumnRenamer 
+    -> TemperatureConverter 
+    -> DataValidator 
+    -> SQLiteWriter;
+
+    // Download data from the given URL
+    block DataDownloader oftype HttpExtractor {
+        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
+        retries: 5;
+    }
+
+    // Extract the downloaded ZIP file
+    block Unzipper oftype ZipExtractor {
+        file: "./mowesta-dataset-20221107.zip";
+        destination: "./temp_data";
+    }
+
+    // Read the extracted CSV file
+    block CSVReader oftype CSVInterpreter {
+        file: "./temp_data/data.csv";
+        delimiter: ",";
+        header: true;
+    }
+
+    // Clean the data to include only relevant columns and rows
+    block DataCleaner oftype ColumnAndRowFilter {
+        columns: ["Geraet", "Hersteller", "Model", "Monat", "Temperatur in °C (DWD)", "Batterietemperatur in °C"];
+        stopAfterColumn: "Geraet aktiv";  // Ignore all columns after "Geraet aktiv"
+    }
+
+    // Rename columns from German to English
+    block ColumnRenamer oftype ColumnMapper {
+        mapping: {
+            "Geraet": "id",
+            "Hersteller": "producer",
+            "Model": "model",
+            "Monat": "month",
+            "Temperatur in °C (DWD)": "temperature",
+            "Batterietemperatur in °C": "battery_temperature"
+        };
+    }
+
+    // Convert temperatures from Celsius to Fahrenheit
+    block TemperatureConverter oftype ColumnTransformer {
+        columns: ["temperature", "battery_temperature"];
+        transform: celsiusToFahrenheit;
+    }
+
+    valuetype celsiusToFahrenheit oftype decimal {
+        expression: "(value * 9/5) + 32";
+    }
+
+    // Validate the data for correctness
+    block DataValidator oftype TableValidator {
+        columns: [
+            "id" oftype bigint { constraints: [PositiveIdConstraint] },
+            "producer" oftype text,
+            "model" oftype text,
+            "month" oftype text,
+            "temperature" oftype float,
+            "battery_temperature" oftype float
+        ];
+    }
+
+    constraint PositiveIdConstraint on bigint: value > 0;
+
+    // Write the transformed data into an SQLite database
+    block SQLiteWriter oftype SQLiteLoader {
+        table: "temperatures";
+        file: "./temperatures.sqlite";
+    }
+}
