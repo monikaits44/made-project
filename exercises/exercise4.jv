@@ -1,31 +1,43 @@
 pipeline TemperatureDataPipeline {
 
-    // Step 1: Download the dataset
-    DataDownloader -> Unzipper -> CSVReader -> DataCleaner -> ColumnRenamer -> TemperatureConverter -> DataValidator -> SQLiteWriter;
+    // Define steps in the pipeline
+    TemperatureDownloader -> ZipExtractor -> FilePicker -> CSVReader
+    -> ColumnSelector -> ColumnRenamer -> TemperatureTransformer -> Validator
+    -> SQLiteWriter;
 
-    // Download data from the given URL
-    block DataDownloader oftype HttpExtractor {
+    // Download the ZIP file
+    block TemperatureDownloader oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
-        retries: 3;
+        retries: 5;
     }
 
-    // Extract the downloaded ZIP file
-    block Unzipper oftype ZipExtractor {
-        file: "./mowesta-dataset-20221107.zip";
-        destination: "./temp_data";
+    // Extract the ZIP archive
+    block ZipExtractor oftype ArchiveInterpreter {
+        archiveType: "zip";
+        destination: "./temp_unzip";
     }
 
-    // Read the extracted CSV file
+    // Pick the required CSV file
+    block FilePicker oftype FileSelector {
+        path: "./temp_unzip/data.csv";
+    }
+
+    // Read the CSV file
     block CSVReader oftype CSVInterpreter {
-        file: "./temp_data/data.csv";
-        delimiter: ",";
+        delimiter: ";";
         header: true;
     }
 
-    // Clean the data to include only relevant columns and rows
-    block DataCleaner oftype ColumnAndRowFilter {
-        columns: ["Geraet", "Hersteller", "Model", "Monat", "Temperatur in °C (DWD)", "Batterietemperatur in °C"];
-        stopAfterColumn: "Geraet aktiv";  // Ignore all columns after "Geraet aktiv"
+    // Select only the required columns
+    block ColumnSelector oftype ColumnFilter {
+        columns: [
+            "Geraet", 
+            "Hersteller", 
+            "Model", 
+            "Monat", 
+            "Temperatur in °C (DWD)", 
+            "Batterietemperatur in °C"
+        ];
     }
 
     // Rename columns from German to English
@@ -40,18 +52,20 @@ pipeline TemperatureDataPipeline {
         };
     }
 
-    // Convert temperatures from Celsius to Fahrenheit
-    block TemperatureConverter oftype ColumnTransformer {
+    // Transform temperature columns from Celsius to Fahrenheit
+    block TemperatureTransformer oftype ColumnTransformer {
         columns: ["temperature", "battery_temperature"];
-        transform: celsiusToFahrenheit;
+        transform: CelsiusToFahrenheit;
     }
 
-    valuetype celsiusToFahrenheit oftype decimal {
-        expression: "(value * 9/5) + 32";
+    transform CelsiusToFahrenheit {
+        from celsius oftype decimal;
+        to fahrenheit oftype decimal;
+        fahrenheit: (celsius * 9/5) + 32;
     }
 
-    // Validate the data for correctness
-    block DataValidator oftype TableValidator {
+    // Validate data before storing it
+    block Validator oftype TableValidator {
         columns: [
             "id" oftype bigint { constraints: [PositiveIdConstraint] },
             "producer" oftype text,
@@ -64,7 +78,7 @@ pipeline TemperatureDataPipeline {
 
     constraint PositiveIdConstraint on bigint: value > 0;
 
-    // Write the transformed data into an SQLite database
+    // Write the data into SQLite
     block SQLiteWriter oftype SQLiteLoader {
         table: "temperatures";
         file: "./temperatures.sqlite";
