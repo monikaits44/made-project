@@ -4,71 +4,81 @@ pipeline WeatherDataProcessing {
     DataDownloader 
         -> ArchiveExtractor
         -> CSVFileSelector 
-        -> TextFileProcessor
-        -> CSVProcessor
-        -> HeaderRenamer1
-        -> HeaderRenamer2
+        -> RawTextInterpreter
+        -> DelimitedCSVParser
+        -> HeaderRenamer_1
+        -> HeaderRenamer_2
         -> DataValidator
-        -> TempToFahrenheit
-        -> BatteryTempToFahrenheit
+        -> TempCelsiusToFahrenheit
+        -> BatteryTempCelsiusToFahrenheit
         -> SQLiteDataSaver;
 
     // BLOCK DEFINITIONS
+    // 1. Download the dataset from the specified URL
     block DataDownloader oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
     }
 
+    // 2. Extract the archive
     block ArchiveExtractor oftype ArchiveInterpreter {
         archiveType: "zip";
     }
 
+    // 3. Select the target CSV file within the extracted archive
     block CSVFileSelector oftype FilePicker {
         path: "/data.csv";
     }
 
-    block TextFileProcessor oftype TextFileInterpreter {}
+    // 4. Interpret raw text files
+    block RawTextInterpreter oftype TextFileInterpreter {}
 
-    block CSVProcessor oftype CSVInterpreter {
+    // 5. Parse CSV file using the appropriate delimiter
+    block DelimitedCSVParser oftype CSVInterpreter {
         delimiter: ";";
     }
 
-    block HeaderRenamer1 oftype CellWriter {
+    // 6. Rename column headers for the specified range
+    // 6.1 Translate and rename columns A-E
+    block HeaderRenamer_1 oftype CellWriter {
         at: range A1:E1;
         write: ["id", "producer", "model", "month", "temperature"];
     }
-
-    block HeaderRenamer2 oftype CellWriter {
+    // 6.2 Translate and rename column J
+    block HeaderRenamer_2 oftype CellWriter {
         at: cell J1;
         write: ["battery_temperature"];
     }
 
+    // 7. Transform Celsius temperatures to Fahrenheit for both temperature columns
     transform CelsiusToFahrenheit {
         from CelsiusValue oftype decimal;
         to FahrenheitValue oftype decimal;
 
-        FahrenheitValue: (CelsiusValue * 9 / 5) + 32;
+        FahrenheitValue: (CelsiusValue * 9/5) + 32;
     }
 
-    block TempToFahrenheit oftype TableTransformer {
+    block TempCelsiusToFahrenheit oftype TableTransformer {
         inputColumns: ["temperature"];
         outputColumn: "temperature";
         uses: CelsiusToFahrenheit;
     }
 
-    block BatteryTempToFahrenheit oftype TableTransformer {
+    block BatteryTempCelsiusToFahrenheit oftype TableTransformer {
         inputColumns: ["battery_temperature"];
         outputColumn: "battery_temperature";
         uses: CelsiusToFahrenheit;
     }
 
-    constraint PositiveID on integer:
+    // 8. Define custom value types and validation constraints
+    constraint PositiveId on integer {
         value > 0;
-
-    valuetype id oftype integer {
-        constraints: [PositiveID];
     }
 
-    constraint MonthInRange on integer:
+    valuetype id oftype integer {
+        constraints: [PositiveId];
+    }
+
+    constraint MonthRangeValidator on integer {
         lowerBound: 1;
         lowerBoundInclusive: true;
         upperBound: 12;
@@ -76,9 +86,10 @@ pipeline WeatherDataProcessing {
     }
 
     valuetype month oftype integer {
-        constraints: [MonthInRange];
+        constraints: [MonthRangeValidator];
     }
 
+    // 9. Validate table structure and enforce data types
     block DataValidator oftype TableInterpreter {
         header: true;
         columns: [
@@ -91,6 +102,7 @@ pipeline WeatherDataProcessing {
         ];
     }
 
+    // 10. Save data into a SQLite database
     block SQLiteDataSaver oftype SQLiteLoader {
         table: "temperatures";
         file: "./temperatures.sqlite";
