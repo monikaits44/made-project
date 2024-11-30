@@ -70,15 +70,14 @@ pipeline WeatherDataProcessing {
     }
 
     // 8. Define custom value types and validation constraints
-    constraint PositiveId on integer {
+    constraint PositiveId on integer:
         value > 0;
-    }
 
     valuetype id oftype integer {
         constraints: [PositiveId];
     }
 
-    constraint MonthRangeValidator on integer {
+    constraint MonthRange oftype RangeConstraint {
         lowerBound: 1;
         lowerBoundInclusive: true;
         upperBound: 12;
@@ -86,7 +85,7 @@ pipeline WeatherDataProcessing {
     }
 
     valuetype month oftype integer {
-        constraints: [MonthRangeValidator];
+        constraints:[MonthRange];
     }
 
     // 9. Validate table structure and enforce data types
