@@ -1,103 +1,113 @@
-pipeline WeatherDataPipeline {
+pipeline WeatherDataProcessing {
 
-    // Define the overall pipeline flow
-    DataFetcher 
-        -> ArchiveHandler
-        -> CSVSelector 
+    // Pipeline structure
+    DataDownloader 
+        -> ArchiveExtractor
+        -> CSVFileSelector 
+        -> TextFileProcessor
         -> CSVProcessor
-        -> RenameHeadersPart1
-        -> RenameHeadersPart2
-        -> TemperatureConverter
-        -> BatteryTempConverter
-        -> SQLiteSaver;
+        -> HeaderRenamer1
+        -> HeaderRenamer2
+        -> DataValidator
+        -> TempToFahrenheit
+        -> BatteryTempToFahrenheit
+        -> SQLiteDataSaver;
 
-    // 1. Fetch the zipped data file
-    block DataFetcher oftype HttpExtractor {
+    // BLOCK DEFINITIONS
+    // 1. Download the dataset from the specified URL
+    block DataDownloader oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
         retries: 5;
     }
 
-    // 2. Unzip the downloaded archive
-    block ArchiveHandler oftype ArchiveInterpreter {
+    // 2. Extract the ZIP archive
+    block ArchiveExtractor oftype ArchiveInterpreter {
         archiveType: "zip";
     }
 
-    // 3. Select the required CSV file
-    block CSVSelector oftype FilePicker {
+    // 3. Pick the target CSV file from the archive
+    block CSVFileSelector oftype FilePicker {
         path: "/data.csv";
     }
 
-    // 4. Parse the CSV file
+    // 4. Process the CSV file as text
+    block TextFileProcessor oftype TextFileInterpreter {}
+
+    // 5. Interpret the CSV file with a specified delimiter
     block CSVProcessor oftype CSVInterpreter {
         delimiter: ";";
     }
 
-    // 5. Rename column headers (Part 1)
-    block RenameHeadersPart1 oftype CellWriter {
+    // 6. Rename column headers
+    // 6.1 Rename headers for columns A-E
+    block HeaderRenamer1 oftype CellWriter {
         at: range A1:E1;
-        write: ["device_id", "manufacturer", "device_model", "record_month", "temperature"];
+        write: ["id", "producer", "model", "month", "temperature"];
     }
 
-    // 6. Rename column headers (Part 2)
-    block RenameHeadersPart2 oftype CellWriter {
+    // 6.2 Rename the header for column J
+    block HeaderRenamer2 oftype CellWriter {
         at: cell J1;
-        write: ["battery_temp"];
+        write: ["battery_temperature"];
     }
 
-    // 7. Convert "temperature" values from Celsius to Fahrenheit
+    // 7. Transform Celsius to Fahrenheit for the temperature column
     transform CelsiusToFahrenheit {
-        from CelsiusInput oftype decimal;
-        to FahrenheitOutput oftype decimal;
+        from CelsiusValue oftype decimal;
+        to FahrenheitValue oftype decimal;
 
-        FahrenheitOutput: (CelsiusInput * 9/5) + 32;
+        FahrenheitValue: (CelsiusValue * 9 / 5) + 32;
     }
 
-    block TemperatureConverter oftype TableTransformer {
+    block TempToFahrenheit oftype TableTransformer {
         inputColumns: ["temperature"];
         outputColumn: "temperature";
         uses: CelsiusToFahrenheit;
     }
 
-    // 8. Convert "battery_temp" values from Celsius to Fahrenheit
-    block BatteryTempConverter oftype TableTransformer {
-        inputColumns: ["battery_temp"];
-        outputColumn: "battery_temp";
+    // 8. Transform Celsius to Fahrenheit for the battery_temperature column
+    block BatteryTempToFahrenheit oftype TableTransformer {
+        inputColumns: ["battery_temperature"];
+        outputColumn: "battery_temperature";
         uses: CelsiusToFahrenheit;
     }
 
-    // 9. Validate column types and define constraints
-    valuetype device_id oftype integer {
-        constraints: [
-            constraint PositiveDeviceId {
-                check: value > 0;
-            }
-        ];
+    // 9. Define custom value types and constraints
+    constraint PositiveID on integer {
+        value > 0;
     }
 
-    valuetype record_month oftype integer {
-        constraints: [
-            constraint MonthRange {
-                check: value >= 1 && value <= 12;
-            }
-        ];
+    valuetype id oftype integer {
+        constraints: [PositiveID];
     }
 
-    block TableStructureValidator oftype TableInterpreter {
+    constraint MonthInRange on integer {
+        lowerBound: 1;
+        lowerBoundInclusive: true;
+        upperBound: 12;
+        upperBoundInclusive: true;
+    }
+
+    valuetype month oftype integer {
+        constraints: [MonthInRange];
+    }
+
+    // 10. Validate the table structure with specified column types
+    block DataValidator oftype TableInterpreter {
         header: true;
         columns: [
-            "device_id" oftype device_id,
-            "manufacturer" oftype text,
-            "device_model" oftype text,
-            "record_month" oftype record_month,
+            "id" oftype id,
+            "producer" oftype text,
+            "model" oftype text,
+            "month" oftype month,
             "temperature" oftype decimal,
-            "battery_temp" oftype decimal
+            "battery_temperature" oftype decimal
         ];
     }
 
-    // 10. Save the processed data to an SQLite database
-    block SQLiteSaver oftype SQLiteLoader {
-        table: "weather_data";
+    // 11. Save the processed data into an SQLite database
+    block SQLiteDataSaver oftype SQLiteLoader {
+        table: "temperatures";
         file: "./temperatures.sqlite";
     }
-
 }
