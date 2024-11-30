@@ -14,44 +14,34 @@ pipeline WeatherDataProcessing {
         -> SQLiteDataSaver;
 
     // BLOCK DEFINITIONS
-    // 1. Download the dataset from the specified URL
     block DataDownloader oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
-        retries: 5;
     }
 
-    // 2. Extract the ZIP archive
     block ArchiveExtractor oftype ArchiveInterpreter {
         archiveType: "zip";
     }
 
-    // 3. Pick the target CSV file from the archive
     block CSVFileSelector oftype FilePicker {
         path: "/data.csv";
     }
 
-    // 4. Process the CSV file as text
     block TextFileProcessor oftype TextFileInterpreter {}
 
-    // 5. Interpret the CSV file with a specified delimiter
     block CSVProcessor oftype CSVInterpreter {
         delimiter: ";";
     }
 
-    // 6. Rename column headers
-    // 6.1 Rename headers for columns A-E
     block HeaderRenamer1 oftype CellWriter {
         at: range A1:E1;
         write: ["id", "producer", "model", "month", "temperature"];
     }
 
-    // 6.2 Rename the header for column J
     block HeaderRenamer2 oftype CellWriter {
         at: cell J1;
         write: ["battery_temperature"];
     }
 
-    // 7. Transform Celsius to Fahrenheit for the temperature column
     transform CelsiusToFahrenheit {
         from CelsiusValue oftype decimal;
         to FahrenheitValue oftype decimal;
@@ -65,23 +55,20 @@ pipeline WeatherDataProcessing {
         uses: CelsiusToFahrenheit;
     }
 
-    // 8. Transform Celsius to Fahrenheit for the battery_temperature column
     block BatteryTempToFahrenheit oftype TableTransformer {
         inputColumns: ["battery_temperature"];
         outputColumn: "battery_temperature";
         uses: CelsiusToFahrenheit;
     }
 
-    // 9. Define custom value types and constraints
-    constraint PositiveID on integer {
+    constraint PositiveID on integer:
         value > 0;
-    }
 
     valuetype id oftype integer {
         constraints: [PositiveID];
     }
 
-    constraint MonthInRange on integer {
+    constraint MonthInRange on integer:
         lowerBound: 1;
         lowerBoundInclusive: true;
         upperBound: 12;
@@ -92,7 +79,6 @@ pipeline WeatherDataProcessing {
         constraints: [MonthInRange];
     }
 
-    // 10. Validate the table structure with specified column types
     block DataValidator oftype TableInterpreter {
         header: true;
         columns: [
@@ -105,7 +91,6 @@ pipeline WeatherDataProcessing {
         ];
     }
 
-    // 11. Save the processed data into an SQLite database
     block SQLiteDataSaver oftype SQLiteLoader {
         table: "temperatures";
         file: "./temperatures.sqlite";
