@@ -69,7 +69,6 @@ def test_database_tables():
     assert not missing_tables, f"Missing tables in insights.db: {missing_tables}"
     print("All expected tables are present in insights.db.")
 
-
 # Test Case 3: Validate data quality in database tables
 def test_table_content_naics_co2_2017():
     print("Checking if table naics_co2_2017 contains data...")
@@ -85,8 +84,6 @@ def test_table_content_naics_co2_2017():
 
     assert count > 0, "Table naics_co2_2017 is empty."
     print("Table naics_co2_2017 contains data.")
-
-
 
 # Test Case 5: Check for missing values in cleaned data
 def test_no_missing_values():
@@ -120,7 +117,7 @@ def test_pipeline_execution_time():
     else:
         logger.error(f"Pipeline failed with error: {result.stderr}")
     
-    # Assert that the pipeline runs within a reasonable time (e.g., 60 seconds)
+    # Assert that the pipeline runs within a reasonable time and takes time for execution
     assert execution_time < 60, f"Pipeline took too long to execute: {execution_time:.2f} seconds."
 
 # Run all tests
