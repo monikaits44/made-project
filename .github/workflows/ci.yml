@@ -9,12 +9,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python
+      # Step 2: Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -27,7 +28,15 @@ jobs:
           pip install -r requirements.txt
 
       # Step 4: Run tests
-      - name: Run Tests
+      - name: Execute Tests
         run: |
-          chmod +x tests.sh
+          chmod +x ./tests.sh
           ./tests.sh
+
+      # Step 5 (Optional): Archive logs for further inspection
+      - name: Upload logs if tests fail
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: ./project/test_pipeline_execution.log
