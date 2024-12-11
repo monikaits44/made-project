@@ -1,6 +1,6 @@
 pipeline GTFSDataProcessingPipeline {
 
-    // Main pipeline flow
+    // Define the pipeline flow
     GTFSDownload 
         -> GTFSExtract 
         -> SelectStopsFile 
@@ -14,28 +14,28 @@ pipeline GTFSDataProcessingPipeline {
         url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
     }
 
-    // 2. Unzip the downloaded GTFS file
+    // 2. Extract the downloaded GTFS file
     block GTFSExtract oftype ArchiveInterpreter {
         archiveType: "zip";
     }
 
-    // 3. Pick the 'stops.txt' file from the archive
+    // 3. Pick the 'stops.txt' file
     block SelectStopsFile oftype FilePicker {
         path: "./stops.txt";
     }
 
     // 4. Read the 'stops.txt' file
     block ReadStopsFile oftype TextFileInterpreter {
-        encoding: "utf8";
+        encoding: "utf-8";
     }
 
-    // 5. Convert the file content to CSV format
+    // 5. Convert the file content into a CSV structure
     block ConvertToCSV oftype CSVInterpreter {
         delimiter: ",";
-        enclosing: '"';
+        enclosing: "\"";
     }
 
-    // Define valuetypes with constraints for validation
+    // Define value types with constraints
     valuetype ZoneID oftype integer {
         constraints: [MustBe1925];
     }
@@ -64,9 +64,7 @@ pipeline GTFSDataProcessingPipeline {
         upperBoundInclusive: true;
     }
 
-    valuetype StopName oftype text {
-        encoding: "utf8";
-    }
+    valuetype StopName oftype text;
 
     // 6. Filter and validate data from the CSV
     block FilterStopsData oftype TableInterpreter {
