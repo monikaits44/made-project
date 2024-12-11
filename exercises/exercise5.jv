@@ -1,0 +1,76 @@
+pipeline ProcessDataGTFSStops {
+
+    // Download and process GTFS data
+    GTFSDataDownloader 
+        -> GTFSArchiveExtractor
+        -> StopsFilePicker
+        -> StopsTextInterpreter
+        -> StopsCSVParser
+        -> StopsDataValidator
+        -> StopsSQLiteSaver;
+
+    // 1. Download the GTFS dataset from the specified URL
+    block GTFSDataDownloader oftype HttpExtractor {
+        url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
+    }
+
+    // 2. Extract the contents of the downloaded archive
+    block GTFSArchiveExtractor oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+
+    // 3. Select the stops.txt file within the extracted archive
+    block StopsFilePicker oftype FilePicker {
+        path: "./stops.txt";
+    }
+
+    // 4. Interpret the file as a UTF-8 encoded text file
+    block StopsTextInterpreter oftype TextFileInterpreter {
+        encoding: "utf8";
+    }
+
+    // 5. Parse the text data as a CSV file
+    block StopsCSVParser oftype CSVInterpreter {
+        delimiter: ",";
+        enclosing: '"';
+    }
+
+    // 6. Validate and filter the data using defined constraints and value types
+    valuetype ValidZoneID oftype integer {
+        constraints: [ZoneFilter];
+    }
+
+    constraint ZoneFilter on integer: value == 1925;
+
+    valuetype GeoCoordinate oftype decimal {
+        constraints: [CoordinateRange];
+    }
+
+    constraint CoordinateRange oftype RangeConstraint {
+        lowerBound: -90;
+        upperBound: 90;
+        lowerBoundInclusive: true;
+        upperBoundInclusive: true;
+    }
+
+    valuetype ValidStopName oftype text {
+        encoding: "utf8"; // Maintain German umlauts
+    }
+
+    block StopsDataValidator oftype TableInterpreter {
+        header: true;
+        columns: [
+            "stop_id" oftype integer,
+            "stop_name" oftype ValidStopName,
+            "stop_lat" oftype GeoCoordinate,
+            "stop_lon" oftype GeoCoordinate,
+            "zone_id" oftype ValidZoneID
+        ];
+    }
+
+    // 7. Save the filtered and validated data to a SQLite database
+    block StopsSQLiteSaver oftype SQLiteLoader {
+        table: "stops";
+        file: "./gtfs.sqlite";
+    }
+}
