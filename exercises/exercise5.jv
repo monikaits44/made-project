@@ -1,75 +1,75 @@
-pipeline ProcessDataGTFSStops {
+pipeline GTFSStopsProcessing {
 
-    // Download and process GTFS data
-    GTFSDataDownloader 
-        -> GTFSArchiveExtractor
-        -> StopsFilePicker
-        -> StopsTextInterpreter
-        -> StopsCSVParser
-        -> StopsDataValidator
-        -> StopsSQLiteSaver;
+    // Main processing flow
+    GTFSDownloader 
+        -> GTFSUnzipper
+        -> GTFSFileExtractor
+        -> GTFSContentReader
+        -> GTFSTextToCSV
+        -> GTFSDataFilter
+        -> GTFSDatabaseSaver;
 
-    // 1. Download the GTFS dataset from the specified URL
-    block GTFSDataDownloader oftype HttpExtractor {
+    // 1. Fetch the GTFS data from the provided URL
+    block GTFSDownloader oftype HttpExtractor {
         url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
     }
 
-    // 2. Extract the contents of the downloaded archive
-    block GTFSArchiveExtractor oftype ArchiveInterpreter {
+    // 2. Decompress the downloaded GTFS archive
+    block GTFSUnzipper oftype ArchiveInterpreter {
         archiveType: "zip";
     }
 
-    // 3. Select the stops.txt file within the extracted archive
-    block StopsFilePicker oftype FilePicker {
+    // 3. Select only the stops.txt file
+    block GTFSFileExtractor oftype FilePicker {
         path: "./stops.txt";
     }
 
-    // 4. Interpret the file as a UTF-8 encoded text file
-    block StopsTextInterpreter oftype TextFileInterpreter {
+    // 4. Read the stops.txt file in UTF-8 format
+    block GTFSContentReader oftype TextFileInterpreter {
         encoding: "utf8";
     }
 
-    // 5. Parse the text data as a CSV file
-    block StopsCSVParser oftype CSVInterpreter {
+    // 5. Convert the text data to a CSV format
+    block GTFSTextToCSV oftype CSVInterpreter {
         delimiter: ",";
         enclosing: '"';
     }
 
-    // 6. Validate and filter the data using defined constraints and value types
-    valuetype ValidZoneID oftype integer {
-        constraints: [ZoneFilter];
+    // 6. Validate and structure data using defined constraints and value types
+    valuetype StopZoneID oftype integer {
+        constraints: [ZoneConstraint];
     }
 
-    constraint ZoneFilter on integer: value == 1925;
+    constraint ZoneConstraint on integer: value == 1925;
 
-    valuetype GeoCoordinate oftype decimal {
-        constraints: [CoordinateRange];
+    valuetype GeoPoint oftype decimal {
+        constraints: [GeoRange];
     }
 
-    constraint CoordinateRange oftype RangeConstraint {
+    constraint GeoRange oftype RangeConstraint {
         lowerBound: -90;
         upperBound: 90;
         lowerBoundInclusive: true;
         upperBoundInclusive: true;
     }
 
-    valuetype ValidStopName oftype text {
-        encoding: "utf8"; // Maintain German umlauts
+    valuetype StopNameType oftype text {
+        encoding: "utf8";
     }
 
-    block StopsDataValidator oftype TableInterpreter {
+    block GTFSDataFilter oftype TableInterpreter {
         header: true;
         columns: [
             "stop_id" oftype integer,
-            "stop_name" oftype ValidStopName,
-            "stop_lat" oftype GeoCoordinate,
-            "stop_lon" oftype GeoCoordinate,
-            "zone_id" oftype ValidZoneID
+            "stop_name" oftype StopNameType,
+            "stop_lat" oftype GeoPoint,
+            "stop_lon" oftype GeoPoint,
+            "zone_id" oftype StopZoneID
         ];
     }
 
-    // 7. Save the filtered and validated data to a SQLite database
-    block StopsSQLiteSaver oftype SQLiteLoader {
+    // 7. Store the processed data into a SQLite database
+    block GTFSDatabaseSaver oftype SQLiteLoader {
         table: "stops";
         file: "./gtfs.sqlite";
     }
