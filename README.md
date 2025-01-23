@@ -1,12 +1,12 @@
 # Sustainability Management in the Supply Chain Industries in the Americas
 
+![alt text](<project/Project Sustainability.jpg>)
+
 ## Overview
 
 This project analyzes the greenhouse gas (GHG) emissions footprint across different supply chain sectors in the United States, aiming to understand variations and provide actionable insights for carbon footprint reduction. As sustainability becomes a critical aspect of business strategies, understanding the GHG emissions in industries such as manufacturing, transportation, and retail etc is vital for developing strategies to reduce environmental impact.
 
 The goal of this analysis is to help supply chain industries identify areas of improvement and formulate strategies to minimize their carbon footprint.
-
-![alt text](<project/Project Sustainability.jpg>)
 
 ## Main Research Question
 
