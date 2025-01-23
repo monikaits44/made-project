@@ -6,7 +6,7 @@ This project analyzes the greenhouse gas (GHG) emissions footprint across differ
 
 The goal of this analysis is to help supply chain industries identify areas of improvement and formulate strategies to minimize their carbon footprint.
 
-![alt text](<Project Sustainability.jpg>)
+![alt text](<project/Project Sustainability.jpg>)
 
 ## Main Research Question
 
